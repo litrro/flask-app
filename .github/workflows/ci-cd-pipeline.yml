@@ -1,0 +1,36 @@
+name: Flask CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - master  # 仅当代码推送到 master 分支时触发流水线
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run tests
+      run: |
+        pytest  # 运行测试
+
+    - name: Build Docker image
+      run: |
+        docker build -t flask-app .
+
+    - name: Run Docker container
+      run: |
+        docker run -d -p 5000:5000 flask-app
